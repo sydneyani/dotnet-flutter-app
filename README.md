@@ -1,6 +1,6 @@
 # Meridian
 
-Meridian is a field-operations API for equipment maintenance. Crews log work orders against substations, generation units, and compressor stations, record inspections, and read a small operational dashboard. It is an original portfolio project in the kind of domain Sydney Ani has worked in: C# services for energy operations, with a Flutter client planned on top of this API.
+Meridian is a field-operations API for equipment maintenance. Crews log work orders against substations, generation units, and compressor stations, record inspections, and read a small operational dashboard. It is an original portfolio project in the kind of domain Sydney Ani has worked in: a C# service for energy operations and a Flutter client for the crew.
 
 The sample data is synthetic. Nothing here is a real utility, person, or asset.
 
@@ -109,6 +109,18 @@ Validation failures return 400 with an `errors` object. Domain rule failures ret
 Access tokens last 8 hours by default, which covers a shift. Refresh tokens last 14 days and rotate on every use. Set `Jwt:SigningKey` to at least 32 bytes outside local development. Set `Seed:Enabled` to `false` when the database should not be filled with demo crew.
 
 `Database:Provider` is `Sqlite` or `Postgres`.
+
+## Mobile client
+
+`mobile/` is a Flutter app on Riverpod and go_router. It signs in, shows the shift board, and lists, opens, edits, and advances work orders. Asset pages record inspections. Work-order lists, asset lists, and the dashboard write the last successful JSON response to local storage and show it when the device cannot reach the API. Creates and edits still need the network.
+
+```bash
+cd mobile
+flutter pub get
+flutter run --dart-define=API_BASE_URL=http://localhost:8080
+```
+
+Use `http://10.0.2.2:8080` from an Android emulator. `flutter analyze` and `flutter test` cover the sign-in form, the work-order list, the dashboard, and the offline cache.
 
 ## Tests
 
