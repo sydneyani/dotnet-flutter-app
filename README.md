@@ -2,7 +2,7 @@
 
 Meridian is a field-operations API for equipment maintenance. Crews log work orders against substations, generation units, and compressor stations, record inspections, and read a small operational dashboard. It is an original portfolio project in the kind of domain Sydney Ani has worked in: a C# service for energy operations and a Flutter client for the crew.
 
-The sample data is synthetic. Nothing here is a real utility, person, or asset.
+The sample data is synthetic. Nothing here is a real utility, person, or asset. [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) is the interview tour: one request through the layers, the state machine, auth, and what was left out on purpose.
 
 ## Architecture
 
@@ -131,6 +131,23 @@ dotnet test backend/Meridian.sln
 - Domain tests cover the state machine, asset tags, labor rounding, and inspection rules.
 - Application tests cover validation, assignment rules, and a failed login.
 - API tests boot the real pipeline with `WebApplicationFactory` and a private SQLite file: login, refresh reuse, a work order from open to complete, authorization, and the seeded dashboard counts.
+
+## Docker
+
+`docker compose up --build` starts PostgreSQL 16 and the API. The API runs migrations, seeds the demo crew, and listens on port 8080. The compose signing key is for the demo stack only. Point the Flutter app at `http://localhost:8080`.
+
+```bash
+docker compose up --build
+```
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on pull requests and on pushes to `main`.
+
+- `dotnet test backend/Meridian.sln --configuration Release`
+- `flutter analyze` and `flutter test` in `mobile/`
+
+The API job does not need Docker. Integration tests use SQLite.
 
 ## Configuration
 
