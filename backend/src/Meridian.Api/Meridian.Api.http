@@ -1,0 +1,29 @@
+@host = http://localhost:8080
+@email = maya.okonkwo@meridian.demo
+@password = Meridian#demo1
+
+### Sign in
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### Current user
+GET {{host}}/api/auth/me
+Authorization: Bearer {{login.response.body.$.accessToken}}
+
+### Dashboard
+GET {{host}}/api/dashboard/summary
+Authorization: Bearer {{login.response.body.$.accessToken}}
+
+### Work orders
+GET {{host}}/api/work-orders?status=Open
+Authorization: Bearer {{login.response.body.$.accessToken}}
+
+### Assets
+GET {{host}}/api/assets?search=TR-1044
+Authorization: Bearer {{login.response.body.$.accessToken}}
