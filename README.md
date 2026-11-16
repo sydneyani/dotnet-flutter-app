@@ -1,8 +1,8 @@
 # Meridian
 
-Meridian is a field-operations API for equipment maintenance. Crews log work orders against substations, generation units, and compressor stations, record inspections, and read a small operational dashboard. It is an original portfolio project in the kind of domain Sydney Ani has worked in: C# services for energy operations, with a Flutter client planned on top of this API.
+Meridian is a field-operations API for equipment maintenance. Crews log work orders against substations, generation units, and compressor stations, record inspections, and read a small operational dashboard. It is an original portfolio project in the kind of domain Sydney Ani has worked in: a C# service for energy operations and a Flutter client for the crew.
 
-The sample data is synthetic. Nothing here is a real utility, person, or asset.
+The sample data is synthetic. Nothing here is a real utility, person, or asset. [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) is the interview tour: one request through the layers, the state machine, auth, and what was left out on purpose.
 
 ## Architecture
 
@@ -110,6 +110,18 @@ Access tokens last 8 hours by default, which covers a shift. Refresh tokens last
 
 `Database:Provider` is `Sqlite` or `Postgres`.
 
+## Mobile client
+
+`mobile/` is a Flutter app on Riverpod and go_router. It signs in, shows the shift board, and lists, opens, edits, and advances work orders. Asset pages record inspections. Work-order lists, asset lists, and the dashboard write the last successful JSON response to local storage and show it when the device cannot reach the API. Creates and edits still need the network.
+
+```bash
+cd mobile
+flutter pub get
+flutter run --dart-define=API_BASE_URL=http://localhost:8080
+```
+
+Use `http://10.0.2.2:8080` from an Android emulator. `flutter analyze` and `flutter test` cover the sign-in form, the work-order list, the dashboard, and the offline cache.
+
 ## Tests
 
 ```bash
@@ -119,6 +131,23 @@ dotnet test backend/Meridian.sln
 - Domain tests cover the state machine, asset tags, labor rounding, and inspection rules.
 - Application tests cover validation, assignment rules, and a failed login.
 - API tests boot the real pipeline with `WebApplicationFactory` and a private SQLite file: login, refresh reuse, a work order from open to complete, authorization, and the seeded dashboard counts.
+
+## Docker
+
+`docker compose up --build` starts PostgreSQL 16 and the API. The API runs migrations, seeds the demo crew, and listens on port 8080. The compose signing key is for the demo stack only. Point the Flutter app at `http://localhost:8080`.
+
+```bash
+docker compose up --build
+```
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on pull requests and on pushes to `main`.
+
+- `dotnet test backend/Meridian.sln --configuration Release`
+- `flutter analyze` and `flutter test` in `mobile/`
+
+The API job does not need Docker. Integration tests use SQLite.
 
 ## Configuration
 
